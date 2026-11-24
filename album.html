@@ -2,26 +2,36 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Мой фотоальбом</title>
     <link href="dflip/css/dflip.min.css" rel="stylesheet" type="text/css">
     <style>
         body {
             margin: 0;
-            padding: 20px;
+            padding: 0;
             background: #2c3e50;
-            display: flex;
-            justify-content: center;
+            height: 100vh;
+            overflow: hidden; /* Убираем лишние полосы прокрутки */
         }
+        /* Растягиваем книгу на весь экран */
         .book-container {
-            width: 100%;
-            max-width: 1000px;
+            width: 100vw;
+            height: 100vh;
         }
     </style>
 </head>
 <body>
 
     <div class="book-container">
-        <div class="_df_book" source="album.pdf" id="flipbook" disableRange="true"></div>
+        <!-- Вот здесь мы передаем настройки прямо в атрибутах -->
+        <div class="_df_book" 
+             source="album.pdf" 
+             id="flipbook"
+             webgl="true"
+             backgroundColor="#2c3e50"
+             height="100vh"
+             pageMode="1">
+        </div>
     </div>
 
     <script src="dflip/js/libs/jquery.min.js" type="text/javascript"></script>
