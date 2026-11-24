@@ -2,8 +2,12 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Мой фотоальбом</title>
+    
+    <!-- Стили библиотеки -->
     <link href="dflip/css/dflip.min.css" rel="stylesheet" type="text/css">
+    
     <style>
         body {
             margin: 0;
@@ -13,27 +17,30 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
+            font-family: sans-serif;
         }
-        /* Обертка, чтобы позиционировать кнопки относительно книги */
+
+        /* Контейнер, который держит книгу и кнопки вместе */
         .book-wrapper {
-            position: relative; 
+            position: relative;
             width: 100%;
             max-width: 1000px;
         }
-        /* Стили для наших кнопок */
+
+        /* Стили для кнопок листания (по бокам) */
         .custom-arrow {
             position: absolute;
             top: 50%;
             transform: translateY(-50%);
-            width: 60px;
-            height: 60px;
-            background: rgba(255, 255, 255, 0.9);
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.85);
             border: none;
             border-radius: 50%;
-            font-size: 30px;
+            font-size: 24px;
             color: #2c3e50;
             cursor: pointer;
-            z-index: 9999; /* Чтобы были поверх книги */
+            z-index: 9999;
             box-shadow: 0 4px 15px rgba(0,0,0,0.3);
             display: flex;
             align-items: center;
@@ -41,17 +48,35 @@
             transition: all 0.2s;
             user-select: none;
         }
-        .custom-arrow:hover {
-            background: #fff;
-            transform: translateY(-50%) scale(1.1);
-        }
-        .arrow-left { left: -80px; }
-        .arrow-right { right: -80px; }
+        .custom-arrow:hover { background: #fff; transform: translateY(-50%) scale(1.1); }
+        .arrow-left { left: -70px; }
+        .arrow-right { right: -70px; }
 
-        /* На узких экранах сдвигаем кнопки внутрь, чтобы не улетали за край */
-        @media (max-width: 1200px) {
-            .arrow-left { left: 10px; }
-            .arrow-right { right: 10px; }
+        /* Кнопка полноэкранного режима (сверху справа) */
+        .btn-fullscreen {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 9999;
+            background: rgba(255, 255, 255, 0.85);
+            border: none;
+            border-radius: 8px;
+            padding: 10px 15px;
+            font-size: 14px;
+            font-weight: bold;
+            color: #2c3e50;
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            transition: background 0.2s;
+        }
+        .btn-fullscreen:hover { background: #fff; }
+
+        /* Адаптив для мобильных телефонов */
+        @media (max-width: 1150px) {
+            .arrow-left { left: 5px; }
+            .arrow-right { right: 5px; }
+            .custom-arrow { width: 40px; height: 40px; font-size: 20px; }
+            .btn-fullscreen { top: 5px; right: 5px; padding: 8px 12px; font-size: 12px; }
         }
     </style>
 </head>
@@ -64,33 +89,53 @@
         <!-- Наши кнопки -->
         <button class="custom-arrow arrow-left" id="btn-prev">❮</button>
         <button class="custom-arrow arrow-right" id="btn-next">❯</button>
+        <button class="btn-fullscreen" id="btn-fullscreen">⛶ На весь экран</button>
     </div>
 
+    <!-- Подключение библиотек -->
     <script src="dflip/js/libs/jquery.min.js" type="text/javascript"></script>
     <script src="dflip/js/dflip.min.js" type="text/javascript"></script>
     
     <script>
-        // Ждем загрузки страницы
         jQuery(document).ready(function($) {
-            
-            // Переменная для хранения объекта книги
             var myFlipbook = null;
 
-            // Функция, которая выполнится, когда книга будет готова
-            window.dFlipReady = function(flipbook) {
-                myFlipbook = flipbook;
-            };
+            // Функция, которая ждет, пока книга полностью загрузится
+            var checkBook = setInterval(function() {
+                var bookEl = document.getElementById('flipbook');
+                
+                // Как только у элемента появляется свойство dFlip, значит книга готова
+                if (bookEl && bookEl.dFlip) {
+                    myFlipbook = bookEl.dFlip;
+                    clearInterval(checkBook); // Останавливаем проверку
+                    console.log("Книга готова к работе!");
+                }
+            }, 300); // Проверяем каждые 0.3 секунды
 
-            // Обработчики кликов для наших кнопок
+            // Кнопка "Назад"
             $('#btn-prev').on('click', function() {
                 if (myFlipbook) {
-                    myFlipbook.prev();
+                    myFlipbook.prev(); // Листаем назад
                 }
             });
 
+            // Кнопка "Вперед"
             $('#btn-next').on('click', function() {
                 if (myFlipbook) {
-                    myFlipbook.next();
+                    myFlipbook.next(); // Листаем вперед
+                }
+            });
+
+            // Кнопка "На весь экран"
+            $('#btn-fullscreen').on('click', function() {
+                if (myFlipbook && myFlipbook.ui && myFlipbook.ui.fullScreen) {
+                    myFlipbook.ui.fullScreen.trigger("click"); // Вызываем встроенный полноэкранный режим
+                } else {
+                    // Если встроенный не сработал, пробуем стандартный браузерный
+                    var elem = document.documentElement;
+                    if (elem.requestFullscreen) {
+                        elem.requestFullscreen();
+                    }
                 }
             });
         });
@@ -98,3 +143,5 @@
 
 </body>
 </html>
+
+
