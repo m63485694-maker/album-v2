@@ -139,7 +139,62 @@
                 }
             });
         });
-    </script>
+    <script>
+jQuery(document).ready(function($) {
+    // Ждем, пока книга загрузится (проверяем наличие страниц внутри)
+    var checkBook = setInterval(function() {
+        var bookEl = document.getElementById('flipbook');
+        
+        // Если внутри книги появились элементы страниц, значит она готова
+        if (bookEl && bookEl.querySelector('.df-page')) {
+            clearInterval(checkBook); // Останавливаем проверку
+            
+            // Функция для имитации клика
+            function simulateClick(xPercent) {
+                var rect = bookEl.getBoundingClientRect();
+                // Вычисляем координаты: xPercent - это доля ширины (0.2 = 20% слева, 0.8 = 80% справа)
+                var x = rect.left + (rect.width * xPercent);
+                var y = rect.top + (rect.height / 2);
+                
+                // Создаем событие клика мышью
+                var event = new MouseEvent('click', {
+                    view: window,
+                    bubbles: true,
+                    cancelable: true,
+                    clientX: x,
+                    clientY: y
+                });
+                // Отправляем клик по книге
+                bookEl.dispatchEvent(event);
+            }
+
+            // Кнопка "Назад" (клик по левой части)
+            $('#btn-prev').on('click', function(e) {
+                e.preventDefault();
+                simulateClick(0.2); // 20% от левого края
+            });
+
+            // Кнопка "Вперед" (клик по правой части)
+            $('#btn-next').on('click', function(e) {
+                e.preventDefault();
+                simulateClick(0.8); // 80% от левого края
+            });
+
+            // Кнопка "На весь экран" (стандартная браузерная)
+            $('#btn-fullscreen').on('click', function() {
+                var elem = document.documentElement;
+                if (elem.requestFullscreen) {
+                    elem.requestFullscreen();
+                } else if (elem.webkitRequestFullscreen) { // Для Safari
+                    elem.webkitRequestFullscreen();
+                } else if (elem.msRequestFullscreen) { // Для IE/Edge
+                    elem.msRequestFullscreen();
+                }
+            });
+        }
+    }, 500); // Проверяем каждые полсекунды
+});
+</script>
 
 </body>
 </html>
