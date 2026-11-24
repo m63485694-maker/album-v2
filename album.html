@@ -17,66 +17,48 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            font-family: sans-serif;
         }
 
-        /* Контейнер, который держит книгу и кнопки вместе */
+        /* Контейнер для книги */
         .book-wrapper {
             position: relative;
             width: 100%;
             max-width: 1000px;
         }
 
-        /* Стили для кнопок листания (по бокам) */
-        .custom-arrow {
+        /* Контурные кнопки поверх книги */
+        .overlay-btn {
             position: absolute;
             top: 50%;
             transform: translateY(-50%);
-            width: 50px;
-            height: 50px;
-            background: rgba(255, 255, 255, 0.85);
-            border: none;
+            width: 60px;
+            height: 60px;
+            background: transparent; /* Прозрачный фон */
+            border: 2px solid rgba(255, 255, 255, 0.6); /* Белая контурная рамка */
             border-radius: 50%;
-            font-size: 24px;
-            color: #2c3e50;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 30px;
             cursor: pointer;
             z-index: 9999;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.2s;
-            user-select: none;
+            transition: all 0.3s ease;
+            outline: none;
         }
-        .custom-arrow:hover { background: #fff; transform: translateY(-50%) scale(1.1); }
-        .arrow-left { left: -70px; }
-        .arrow-right { right: -70px; }
 
-        /* Кнопка полноэкранного режима (сверху справа) */
-        .btn-fullscreen {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            z-index: 9999;
-            background: rgba(255, 255, 255, 0.85);
-            border: none;
-            border-radius: 8px;
-            padding: 10px 15px;
-            font-size: 14px;
-            font-weight: bold;
-            color: #2c3e50;
-            cursor: pointer;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-            transition: background 0.2s;
+        .overlay-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: #fff;
+            color: #fff;
         }
-        .btn-fullscreen:hover { background: #fff; }
 
-        /* Адаптив для мобильных телефонов */
-        @media (max-width: 1150px) {
-            .arrow-left { left: 5px; }
-            .arrow-right { right: 5px; }
-            .custom-arrow { width: 40px; height: 40px; font-size: 20px; }
-            .btn-fullscreen { top: 5px; right: 5px; padding: 8px 12px; font-size: 12px; }
+        .btn-prev { left: 10px; }
+        .btn-next { right: 10px; }
+
+        /* На мобильных экранах делаем кнопки чуть меньше */
+        @media (max-width: 768px) {
+            .overlay-btn { width: 45px; height: 45px; font-size: 22px; }
         }
     </style>
 </head>
@@ -86,10 +68,9 @@
         <!-- Сама книга -->
         <div class="_df_book" source="album.pdf" id="flipbook" disableRange="true"></div>
         
-        <!-- Наши кнопки -->
-        <button class="custom-arrow arrow-left" id="btn-prev">❮</button>
-        <button class="custom-arrow arrow-right" id="btn-next">❯</button>
-        <button class="btn-fullscreen" id="btn-fullscreen">⛶ На весь экран</button>
+        <!-- Контурные кнопки -->
+        <button class="overlay-btn btn-prev" id="btn-prev">❮</button>
+        <button class="overlay-btn btn-next" id="btn-next">❯</button>
     </div>
 
     <!-- Подключение библиотек -->
@@ -98,105 +79,43 @@
     
     <script>
         jQuery(document).ready(function($) {
-            var myFlipbook = null;
-
-            // Функция, которая ждет, пока книга полностью загрузится
-            var checkBook = setInterval(function() {
-                var bookEl = document.getElementById('flipbook');
-                
-                // Как только у элемента появляется свойство dFlip, значит книга готова
-                if (bookEl && bookEl.dFlip) {
-                    myFlipbook = bookEl.dFlip;
-                    clearInterval(checkBook); // Останавливаем проверку
-                    console.log("Книга готова к работе!");
-                }
-            }, 300); // Проверяем каждые 0.3 секунды
-
-            // Кнопка "Назад"
-            $('#btn-prev').on('click', function() {
-                if (myFlipbook) {
-                    myFlipbook.prev(); // Листаем назад
-                }
-            });
-
-            // Кнопка "Вперед"
-            $('#btn-next').on('click', function() {
-                if (myFlipbook) {
-                    myFlipbook.next(); // Листаем вперед
-                }
-            });
-
-            // Кнопка "На весь экран"
-            $('#btn-fullscreen').on('click', function() {
-                if (myFlipbook && myFlipbook.ui && myFlipbook.ui.fullScreen) {
-                    myFlipbook.ui.fullScreen.trigger("click"); // Вызываем встроенный полноэкранный режим
-                } else {
-                    // Если встроенный не сработал, пробуем стандартный браузерный
-                    var elem = document.documentElement;
-                    if (elem.requestFullscreen) {
-                        elem.requestFullscreen();
-                    }
-                }
-            });
-        });
-    <script>
-jQuery(document).ready(function($) {
-    // Ждем, пока книга загрузится (проверяем наличие страниц внутри)
-    var checkBook = setInterval(function() {
-        var bookEl = document.getElementById('flipbook');
-        
-        // Если внутри книги появились элементы страниц, значит она готова
-        if (bookEl && bookEl.querySelector('.df-page')) {
-            clearInterval(checkBook); // Останавливаем проверку
             
-            // Функция для имитации клика
-            function simulateClick(xPercent) {
-                var rect = bookEl.getBoundingClientRect();
-                // Вычисляем координаты: xPercent - это доля ширины (0.2 = 20% слева, 0.8 = 80% справа)
-                var x = rect.left + (rect.width * xPercent);
-                var y = rect.top + (rect.height / 2);
-                
-                // Создаем событие клика мышью
-                var event = new MouseEvent('click', {
-                    view: window,
-                    bubbles: true,
-                    cancelable: true,
-                    clientX: x,
-                    clientY: y
-                });
-                // Отправляем клик по книге
-                bookEl.dispatchEvent(event);
-            }
+            // Ждем, пока страница и книга загрузятся
+            setTimeout(function() {
+                var bookEl = document.getElementById('flipbook');
 
-            // Кнопка "Назад" (клик по левой части)
-            $('#btn-prev').on('click', function(e) {
-                e.preventDefault();
-                simulateClick(0.2); // 20% от левого края
-            });
-
-            // Кнопка "Вперед" (клик по правой части)
-            $('#btn-next').on('click', function(e) {
-                e.preventDefault();
-                simulateClick(0.8); // 80% от левого края
-            });
-
-            // Кнопка "На весь экран" (стандартная браузерная)
-            $('#btn-fullscreen').on('click', function() {
-                var elem = document.documentElement;
-                if (elem.requestFullscreen) {
-                    elem.requestFullscreen();
-                } else if (elem.webkitRequestFullscreen) { // Для Safari
-                    elem.webkitRequestFullscreen();
-                } else if (elem.msRequestFullscreen) { // Для IE/Edge
-                    elem.msRequestFullscreen();
+                // Функция для имитации клика в нужную часть книги
+                function simulateClick(element, xPercent) {
+                    var rect = element.getBoundingClientRect();
+                    var x = rect.left + (rect.width * xPercent);
+                    var y = rect.top + (rect.height / 2);
+                    
+                    var event = new MouseEvent('click', {
+                        view: window,
+                        bubbles: true,
+                        cancelable: true,
+                        clientX: x,
+                        clientY: y
+                    });
+                    element.dispatchEvent(event);
                 }
-            });
-        }
-    }, 500); // Проверяем каждые полсекунды
-});
-</script>
+
+                // Кнопка "Назад" - кликаем по левой трети книги (там, где обычно листает назад)
+                $('#btn-prev').on('click', function(e) {
+                    e.stopPropagation(); // Чтобы клик по кнопке не "проваливался" в книгу
+                    simulateClick(bookEl, 0.3); // 30% от левого края
+                });
+
+                // Кнопка "Вперед" - кликаем по правой трети книги
+                $('#btn-next').on('click', function(e) {
+                    e.stopPropagation();
+                    simulateClick(bookEl, 0.7); // 70% от левого края (то есть 30% от правого)
+                });
+
+            }, 1500); // Небольшая задержка 1.5 сек, чтобы книга точно успела прогрузиться
+        });
+    </script>
 
 </body>
 </html>
-
 
