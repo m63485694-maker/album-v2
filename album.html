@@ -2,12 +2,8 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Мой фотоальбом</title>
-    
-    <!-- Стили библиотеки -->
     <link href="dflip/css/dflip.min.css" rel="stylesheet" type="text/css">
-    
     <style>
         body {
             margin: 0;
@@ -15,107 +11,21 @@
             background: #2c3e50;
             display: flex;
             justify-content: center;
-            align-items: center;
-            min-height: 100vh;
         }
-
-        /* Контейнер для книги */
-        .book-wrapper {
-            position: relative;
+        .book-container {
             width: 100%;
             max-width: 1000px;
-        }
-
-        /* Контурные кнопки поверх книги */
-        .overlay-btn {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 60px;
-            height: 60px;
-            background: transparent; /* Прозрачный фон */
-            border: 2px solid rgba(255, 255, 255, 0.6); /* Белая контурная рамка */
-            border-radius: 50%;
-            color: rgba(255, 255, 255, 0.8);
-            font-size: 30px;
-            cursor: pointer;
-            z-index: 9999;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-            outline: none;
-        }
-
-        .overlay-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
-            border-color: #fff;
-            color: #fff;
-        }
-
-        .btn-prev { left: 10px; }
-        .btn-next { right: 10px; }
-
-        /* На мобильных экранах делаем кнопки чуть меньше */
-        @media (max-width: 768px) {
-            .overlay-btn { width: 45px; height: 45px; font-size: 22px; }
         }
     </style>
 </head>
 <body>
 
-    <div class="book-wrapper">
-        <!-- Сама книга -->
+    <div class="book-container">
         <div class="_df_book" source="album.pdf" id="flipbook" disableRange="true"></div>
-        
-        <!-- Контурные кнопки -->
-        <button class="overlay-btn btn-prev" id="btn-prev">❮</button>
-        <button class="overlay-btn btn-next" id="btn-next">❯</button>
     </div>
 
-    <!-- Подключение библиотек -->
     <script src="dflip/js/libs/jquery.min.js" type="text/javascript"></script>
     <script src="dflip/js/dflip.min.js" type="text/javascript"></script>
-    
-    <script>
-        jQuery(document).ready(function($) {
-            
-            // Ждем, пока страница и книга загрузятся
-            setTimeout(function() {
-                var bookEl = document.getElementById('flipbook');
-
-                // Функция для имитации клика в нужную часть книги
-                function simulateClick(element, xPercent) {
-                    var rect = element.getBoundingClientRect();
-                    var x = rect.left + (rect.width * xPercent);
-                    var y = rect.top + (rect.height / 2);
-                    
-                    var event = new MouseEvent('click', {
-                        view: window,
-                        bubbles: true,
-                        cancelable: true,
-                        clientX: x,
-                        clientY: y
-                    });
-                    element.dispatchEvent(event);
-                }
-
-                // Кнопка "Назад" - кликаем по левой трети книги (там, где обычно листает назад)
-                $('#btn-prev').on('click', function(e) {
-                    e.stopPropagation(); // Чтобы клик по кнопке не "проваливался" в книгу
-                    simulateClick(bookEl, 0.3); // 30% от левого края
-                });
-
-                // Кнопка "Вперед" - кликаем по правой трети книги
-                $('#btn-next').on('click', function(e) {
-                    e.stopPropagation();
-                    simulateClick(bookEl, 0.7); // 70% от левого края (то есть 30% от правого)
-                });
-
-            }, 1500); // Небольшая задержка 1.5 сек, чтобы книга точно успела прогрузиться
-        });
-    </script>
 
 </body>
 </html>
-
