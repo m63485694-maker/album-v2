@@ -2,40 +2,49 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Мой фотоальбом</title>
     <link href="dflip/css/dflip.min.css" rel="stylesheet" type="text/css">
     <style>
         body {
             margin: 0;
-            padding: 0;
+            padding: 20px;
             background: #2c3e50;
-            height: 100vh;
-            overflow: hidden; /* Убираем лишние полосы прокрутки */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
         }
-        /* Растягиваем книгу на весь экран */
         .book-container {
-            width: 100vw;
-            height: 100vh;
+            width: 100%;
+            max-width: 1000px;
+            /* Ограничиваем высоту, чтобы книга не прыгала */
+            height: 80vh; 
         }
     </style>
 </head>
 <body>
 
     <div class="book-container">
-        <!-- Вот здесь мы передаем настройки прямо в атрибутах -->
-        <div class="_df_book" 
-             source="album.pdf" 
-             id="flipbook"
-             webgl="true"
-             backgroundColor="#2c3e50"
-             height="100vh"
-             pageMode="1">
-        </div>
+        <!-- Возвращаем стандартные настройки. Никаких 100vh и pageMode -->
+        <div class="_df_book" source="album.pdf" id="flipbook" webgl="true"></div>
     </div>
 
     <script src="dflip/js/libs/jquery.min.js" type="text/javascript"></script>
     <script src="dflip/js/dflip.min.js" type="text/javascript"></script>
+
+    <script>
+        // Этот скрипт просто ждет загрузки и включает полноэкранный режим
+        // (Браузер разрешит это, так как вы уже взаимодействуете со страницей)
+        jQuery(document).ready(function($) {
+            setTimeout(function() {
+                // Находим кнопку полноэкранного режима внутри DearFlip и "нажимаем" её
+                var fsBtn = $('.df-ui-btn.df-icon-expand');
+                if (fsBtn.length > 0) {
+                    fsBtn.trigger('click');
+                }
+            }, 1000); // Ждем 1 секунду, чтобы книга прогрузилась
+        });
+    </script>
 
 </body>
 </html>
