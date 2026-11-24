@@ -16,40 +16,75 @@
             width: 100%;
             max-width: 1000px;
         }
+        /* Стили для наших новых кнопок, чтобы они были красивыми */
+        .custom-nav-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.7);
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            font-size: 24px;
+            cursor: pointer;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            color: #333;
+            transition: background 0.3s;
+        }
+        .custom-nav-btn:hover {
+            background: #fff;
+        }
+        .prev-btn { left: -60px; }
+        .next-btn { right: -60px; }
+
+        /* Если экран узкий, сдвигаем кнопки внутрь */
+        @media (max-width: 1150px) {
+            .prev-btn { left: 10px; }
+            .next-btn { right: 10px; }
+        }
     </style>
 </head>
 <body>
 
-    <div class="book-container">
+    <div class="book-container" id="book-wrapper">
         <div class="_df_book" source="album.pdf" id="flipbook" disableRange="true"></div>
-    
+    </div> <!-- Закрывающий тег для book-container! -->
 
     <script src="dflip/js/libs/jquery.min.js" type="text/javascript"></script>
     <script src="dflip/js/dflip.min.js" type="text/javascript"></script>
-<script>
-jQuery(function($){
-    // Ждем, пока книга будет готова
-    DEARFLIP.defaults.onReady = function(flipbook) {
-        // Проверяем, что это наша встроенная книга (а не всплывающее окно)
-        if (flipbook.options.isLightBox !== true) {
+    
+    <script>
+        // Ждем, пока загрузится страница и jQuery
+        jQuery(document).ready(function($) {
             
-            // Создаем кнопку "Назад"
-            var prevBtn = jQuery('<div class="df-ui-btn df-icon-arrow-left" title="Назад"></div>');
-            prevBtn.on("click", function(){ flipbook.prev(); });
-            
-            // Создаем кнопку "Вперед"
-            var nextBtn = jQuery('<div class="df-ui-btn df-icon-arrow-right" title="Вперед"></div>');
-            nextBtn.on("click", function(){ flipbook.next(); });
-            
-            // Вставляем кнопки в панель управления, рядом с номером страницы
-            // (если pageNumber не существует, они вставятся в общую панель)
-            if (flipbook.ui && flipbook.ui.pageNumber) {
-                flipbook.ui.pageNumber.before(prevBtn);
-                flipbook.ui.pageNumber.after(nextBtn);
-            }
-        }
-    };
-});
-</script>
+            // Эта функция вызывается, когда книга готова
+            window.dFlipReady = function(flipbook) {
+                
+                // Создаем кнопку "Назад"
+                var prevBtn = $('<button class="custom-nav-btn prev-btn">❮</button>');
+                prevBtn.on("click", function(e) {
+                    e.preventDefault();
+                    flipbook.prev();
+                });
+                
+                // Создаем кнопку "Вперед"
+                var nextBtn = $('<button class="custom-nav-btn next-btn">❯</button>');
+                nextBtn.on("click", function(e) {
+                    e.preventDefault();
+                    flipbook.next();
+                });
+                
+                // Добавляем кнопки прямо в контейнер с книгой
+                $('#book-wrapper').append(prevBtn);
+                $('#book-wrapper').append(nextBtn);
+            };
+        });
+    </script>
+
 </body>
 </html>
