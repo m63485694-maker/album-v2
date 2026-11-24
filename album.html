@@ -11,78 +11,88 @@
             background: #2c3e50;
             display: flex;
             justify-content: center;
+            align-items: center;
+            min-height: 100vh;
         }
-        .book-container {
+        /* Обертка, чтобы позиционировать кнопки относительно книги */
+        .book-wrapper {
+            position: relative; 
             width: 100%;
             max-width: 1000px;
         }
-        /* Стили для наших новых кнопок, чтобы они были красивыми */
-        .custom-nav-btn {
+        /* Стили для наших кнопок */
+        .custom-arrow {
             position: absolute;
             top: 50%;
             transform: translateY(-50%);
-            background: rgba(255, 255, 255, 0.7);
+            width: 60px;
+            height: 60px;
+            background: rgba(255, 255, 255, 0.9);
             border: none;
             border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            font-size: 24px;
+            font-size: 30px;
+            color: #2c3e50;
             cursor: pointer;
-            z-index: 1000;
+            z-index: 9999; /* Чтобы были поверх книги */
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-            color: #333;
-            transition: background 0.3s;
+            transition: all 0.2s;
+            user-select: none;
         }
-        .custom-nav-btn:hover {
+        .custom-arrow:hover {
             background: #fff;
+            transform: translateY(-50%) scale(1.1);
         }
-        .prev-btn { left: -60px; }
-        .next-btn { right: -60px; }
+        .arrow-left { left: -80px; }
+        .arrow-right { right: -80px; }
 
-        /* Если экран узкий, сдвигаем кнопки внутрь */
-        @media (max-width: 1150px) {
-            .prev-btn { left: 10px; }
-            .next-btn { right: 10px; }
+        /* На узких экранах сдвигаем кнопки внутрь, чтобы не улетали за край */
+        @media (max-width: 1200px) {
+            .arrow-left { left: 10px; }
+            .arrow-right { right: 10px; }
         }
     </style>
 </head>
 <body>
 
-    <div class="book-container" id="book-wrapper">
+    <div class="book-wrapper">
+        <!-- Сама книга -->
         <div class="_df_book" source="album.pdf" id="flipbook" disableRange="true"></div>
-    </div> <!-- Закрывающий тег для book-container! -->
+        
+        <!-- Наши кнопки -->
+        <button class="custom-arrow arrow-left" id="btn-prev">❮</button>
+        <button class="custom-arrow arrow-right" id="btn-next">❯</button>
+    </div>
 
     <script src="dflip/js/libs/jquery.min.js" type="text/javascript"></script>
     <script src="dflip/js/dflip.min.js" type="text/javascript"></script>
     
     <script>
-        // Ждем, пока загрузится страница и jQuery
+        // Ждем загрузки страницы
         jQuery(document).ready(function($) {
             
-            // Эта функция вызывается, когда книга готова
+            // Переменная для хранения объекта книги
+            var myFlipbook = null;
+
+            // Функция, которая выполнится, когда книга будет готова
             window.dFlipReady = function(flipbook) {
-                
-                // Создаем кнопку "Назад"
-                var prevBtn = $('<button class="custom-nav-btn prev-btn">❮</button>');
-                prevBtn.on("click", function(e) {
-                    e.preventDefault();
-                    flipbook.prev();
-                });
-                
-                // Создаем кнопку "Вперед"
-                var nextBtn = $('<button class="custom-nav-btn next-btn">❯</button>');
-                nextBtn.on("click", function(e) {
-                    e.preventDefault();
-                    flipbook.next();
-                });
-                
-                // Добавляем кнопки прямо в контейнер с книгой
-                $('#book-wrapper').append(prevBtn);
-                $('#book-wrapper').append(nextBtn);
+                myFlipbook = flipbook;
             };
+
+            // Обработчики кликов для наших кнопок
+            $('#btn-prev').on('click', function() {
+                if (myFlipbook) {
+                    myFlipbook.prev();
+                }
+            });
+
+            $('#btn-next').on('click', function() {
+                if (myFlipbook) {
+                    myFlipbook.next();
+                }
+            });
         });
     </script>
 
